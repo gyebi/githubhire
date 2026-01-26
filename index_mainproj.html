@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeSignal – Africa | Talent Search</title>
+  <link rel="stylesheet" href="githubstyle.css" />
+</head>
+
+<body>
+  <!-- Top Nav -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CS</div>
+      <div class="brand-text">
+        <h1>CodeSignal – Africa</h1>
+        <p>Talent Search Dashboard</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" type="button">Docs</button>
+      <button class="btn btn-ghost" type="button">Pricing</button>
+      <button class="btn btn-primary" type="button">Recruiter Login</button>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <main class="layout">
+    <!-- Sidebar Filters -->
+    <aside class="filters">
+      <div class="panel-title">
+        <h2>Filters</h2>
+        <button class="btn btn-ghost btn-sm" type="button">Reset</button>
+      </div>
+
+      <div class="field">
+        <label for="q">Search</label>
+        <input id="q" type="text" placeholder="username, name, keywords..." />
+        <small class="hint">Example: “frontend Ghana”, “Kotlin Nairobi”, “react”</small>
+      </div>
+
+      <div class="field">
+        <label for="language">Primary Language</label>
+        <select id="language">
+          <option value="">Any</option>
+          <option>JavaScript</option>
+          <option>TypeScript</option>
+          <option>Python</option>
+          <option>Java</option>
+          <option>Kotlin</option>
+          <option>Go</option>
+          <option>PHP</option>
+          <option>C#</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="region">Region</label>
+        <select id="region">
+          <option value="">Any</option>
+          <option>West Africa</option>
+          <option>East Africa</option>
+          <option>North Africa</option>
+          <option>Central Africa</option>
+          <option>Southern Africa</option>
+          <option>Remote (Africa)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="country">Country</label>
+        <select id="country">
+          <option value="">Any</option>
+          <option>Ghana</option>
+          <option>Nigeria</option>
+          <option>Kenya</option>
+          <option>South Africa</option>
+          <option>Egypt</option>
+          <option>Morocco</option>
+          <option>Senegal</option>
+          <option>Uganda</option>
+          <option>Tanzania</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="activity">Recent Activity</label>
+        <select id="activity">
+          <option value="">Any</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="365">Last 12 months</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="minRepos">Min Repos</label>
+          <input id="minRepos" type="number" min="0" placeholder="e.g. 5" />
+        </div>
+        <div class="field">
+          <label for="minScore">Min Score</label>
+          <input id="minScore" type="number" min="0" max="100" placeholder="e.g. 70" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Signals</label>
+        <div class="checks">
+          <label class="check">
+            <input type="checkbox" />
+            <span>Has README</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" />
+            <span>Has Stars</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" />
+            <span>Recent Commits</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" />
+            <span>Open Source Contributor</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" type="button" id="searchBtn">
+        Search Talent
+      </button>
+
+      <div class="note">
+        <p><strong>Note:</strong> This UI is ready to connect to the GitHub API next.</p>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <section class="content">
+      <!-- Summary Row -->
+      <div class="summary">
+        <div class="summary-left">
+          <h2>Talent Results</h2>
+          <p class="muted">Showing <strong>12</strong> candidates • Sorted by <strong>Talent Score</strong></p>
+        </div>
+
+        <div class="summary-right">
+          <select class="sort">
+            <option>Sort: Talent Score (High → Low)</option>
+            <option>Sort: Recently Active</option>
+            <option>Sort: Followers</option>
+            <option>Sort: Repo Count</option>
+          </select>
+
+          <div class="view-toggle">
+            <button class="btn btn-ghost btn-sm active" type="button">Cards</button>
+            <button class="btn btn-ghost btn-sm" type="button">Table</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div class="results-grid">
+        <!-- Candidate Card -->
+        <article class="card">
+          <div class="card-top">
+            <img class="avatar" src="https://avatars.githubusercontent.com/u/583231?v=4" alt="avatar" />
+            <div class="who">
+              <h3>octocat <span class="pill">Frontend</span></h3>
+              <p class="muted">Accra, Ghana • Open to remote</p>
+            </div>
+            <div class="score">
+              <span class="score-num">82</span>
+              <span class="score-label">Talent Score</span>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-num">38</span>
+              <span class="stat-label">Repos</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">1.2k</span>
+              <span class="stat-label">Followers</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">JS</span>
+              <span class="stat-label">Top Lang</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">7d</span>
+              <span class="stat-label">Last Active</span>
+            </div>
+          </div>
+
+          <div class="tags">
+            <span class="tag">JavaScript</span>
+            <span class="tag">React</span>
+            <span class="tag">Node.js</span>
+            <span class="tag">API</span>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn btn-ghost" type="button">View Profile</button>
+            <button class="btn btn-primary" type="button">Shortlist</button>
+          </div>
+
+          <div class="contact">
+            <a href="#" class="contact-link">Portfolio</a>
+            <a href="#" class="contact-link">GitHub</a>
+            <a href="#" class="contact-link">LinkedIn</a>
+          </div>
+        </article>
+
+        <!-- Another Candidate Card -->
+        <article class="card">
+          <div class="card-top">
+            <div class="avatar placeholder">WG</div>
+            <div class="who">
+              <h3>winfredgyebi <span class="pill pill-alt">Mobile</span></h3>
+              <p class="muted">Hartford, CT • Ghana • Android / Kotlin</p>
+            </div>
+            <div class="score">
+              <span class="score-num">76</span>
+              <span class="score-label">Talent Score</span>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-num">21</span>
+              <span class="stat-label">Repos</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">240</span>
+              <span class="stat-label">Followers</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">Kotlin</span>
+              <span class="stat-label">Top Lang</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">30d</span>
+              <span class="stat-label">Last Active</span>
+            </div>
+          </div>
+
+          <div class="tags">
+            <span class="tag">Kotlin</span>
+            <span class="tag">Jetpack Compose</span>
+            <span class="tag">Firebase</span>
+            <span class="tag">MVVM</span>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn btn-ghost" type="button">View Profile</button>
+            <button class="btn btn-primary" type="button">Shortlist</button>
+          </div>
+
+          <div class="contact">
+            <a href="#" class="contact-link">Blog</a>
+            <a href="#" class="contact-link">GitHub</a>
+            <a href="#" class="contact-link muted">Email (Private)</a>
+          </div>
+        </article>
+
+        <!-- Loading skeleton cards (for future JS states) -->
+        <article class="card skeleton">
+          <div class="sk-line sk-title"></div>
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+        </article>
+
+        <article class="card skeleton">
+          <div class="sk-line sk-title"></div>
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+        </article>
+      </div>
+
+      <!-- Footer note -->
+      <footer class="footer">
+        <p class="muted">
+          Data Source: GitHub public profiles & repositories. We respect privacy and show only public info.
+        </p>
+      </footer>
+    </section>
+  </main>
+  <script src="githubscript.js"></script>
+
+</body>
+</html>

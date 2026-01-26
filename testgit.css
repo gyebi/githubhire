@@ -1,0 +1,145 @@
+:root{
+  --bg: #ced3de;
+  --panel: rgba(17,31,58,.75);
+  --border: rgba(255,255,255,.10);
+  --text: #e7eefc;
+  --muted: rgba(231,238,252,.70);
+  --accent: #22c55e;
+  --accent2: #16a34a;
+  --shadow: 0 14px 40px rgba(0,0,0,.40);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(900px 600px at 15% -10%, rgba(34,197,94,.18), transparent 60%),
+              radial-gradient(900px 600px at 90% 0%, rgba(99,102,241,.14), transparent 55%),
+              var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px;
+}
+
+/* Wrap everything in a centered panel if you want */
+.output,
+#results,
+#github-output{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+/* Button */
+#gitUser{
+  appearance: none;
+  border: 1px solid rgba(34,197,94,.35);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #277e53;
+  font-weight: 800;
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  margin-bottom: 14px;
+}
+
+#gitUser:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(34,197,94,.22);
+  filter: brightness(1.03);
+}
+
+#gitUser:active{
+  transform: translateY(0);
+}
+
+/* Results container */
+#results{
+  padding: 14px;
+  margin-top: 8px;
+}
+
+/* If you append <p> items, make them look like rows/cards */
+#results p{
+  padding: 12px 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background:#3f60a7;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+/* Optional: make usernames pop */
+#results p strong{
+  font-weight: 900;
+}
+
+/* Optional: link styling inside results */
+#results a{
+  color: rgba(231,238,252,.90);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(231,238,252,.20);
+}
+
+#results a:hover{
+  color: #bfffd8;
+  border-bottom-color: rgba(34,197,94,.55);
+}
+
+/* Output area (for detailed profile later) */
+#github-output{
+  padding: 14px;
+  margin-top: 14px;
+}
+
+/* Small helper text */
+.muted{
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.user-card{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+  background: rgba(15,26,48,.55);
+}
+
+.user-card img{
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,.15);
+}
+
+.user-info h3{
+  margin: 0;
+  font-size: 1rem;
+}
+
+.user-info a{
+  font-size: .9rem;
+  color: #22c55e;
+  text-decoration: none;
+}
+
+.user-info a:hover{
+  text-decoration: underline;
+}
+
+
+@media (max-width: 600px){
+  body{ padding: 16px; }
+  .gitUser{ width: 100%; }
+}
