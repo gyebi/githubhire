@@ -1,19 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="testgit.css" />
 </head>
+
 <body>
-    
-        <section class="grid-item applet-card" id="github-api">
-            <h2>🧑‍💻 GitHub User</h2>
-            <button id = "gitUser" class = "gitUser">Get User</button>
-            <div id = "results"></div>
-            <div class="output" id="github-output"></div>
-        </section>
-    <script src = "githubscript.js"></script> 
+
+    <section class="grid-item applet-card" id="github-api">
+        <h2>🧑‍💻 GitHub User</h2>
+
+        <div class="field" id = "paramaters">
+
+            <label for="country">Country</label>
+            <input type="text" id="country" placeholder="eg. Ghana" />
+
+            <label for="language">Language</label>
+            <input type="text" id="language" placeholder="eg. Javascript" />
+
+            <label for="pages">Number of Records</label>
+            <input type="text" id="num-records" placeholder="eg. 100" />
+
+        </div>
+
+        <button id="gitUser" class="gitUser">Get User</button>
+        <div id="results"></div>
+        <button id = "loadMore">Load More >></button>
+
+        <div class="output" id="github-output"></div>
+    </section>
+    <script src="githubscript.js"></script>
 </body>
+
 </html>

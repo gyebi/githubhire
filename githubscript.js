@@ -3,28 +3,39 @@ console.log("Script loaded");
 //const searchBtn = document.getElementById("searchBtn");
 
 // Inputs
-//const languageSelect = document.getElementById("language");
-//const countrySelect = document.getElementById("country");
+const countryInput = document.getElementById("country");
+const languageInput = document.getElementById("language");
+const recordsInput = document.getElementById("num-records");
 //const searchInput = document.getElementById("q");
 
 //const resultsGrid = document.querySelector(".results-grid");
 
 const getUserBtn = document.getElementById("gitUser");
 const resultsDiv = document.getElementById("results");
+const loadMore = document.getElementById("loadMore");
 
+let currentPage = 1; 
 
+async function handleSearch(isLoadMore = false) {
+  
+    //controls pagination
+    if(!isLoadMore){
+        currentPage = 1;
+        resultsDiv.innerHTML = "";
+    }
 
-async function handleSearch() {
-  // 1. Read values from UI
-  //const language = languageSelect.value;
-  //const country = countrySelect.value;
+    // 1. Read values from UI
+   country = countryInput.value;
+   language = languageInput.value;
+   const results_per_page = Number(recordsInput.value);
+  
   //const keyword = searchInput.value.trim();
    
-  const language = "Javascript";
-  const country = "Ghana";
+  //const language = "Javascript";
+  //const country = "Ghana";
 
-  console.log("Language:", language);
-  console.log("Country:", country);
+  console.log(`"Language:", ${country}`);
+  console.log(`"Country:", ${language}`);
   //console.log("Keyword:", keyword);
 /*
   // 2. Build GitHub search query
@@ -43,12 +54,12 @@ async function handleSearch() {
   }
 */
   //const query = queryParts.join(" ");
-  const query = `language:Javascript location:Ghana`;
+  const query = `language:${language} location:${country}`;
 
   console.log("Final GitHub query:", query);
 
   // 3. Call GitHub API
-  const url = `https://api.github.com/search/users?q=${encodeURIComponent(query)}&per_page=10`;
+  const url = `https://api.github.com/search/users?q=${encodeURIComponent(query)}&per_page=${results_per_page}&page=${currentPage}`;
 
   console.log("Request URL:", url);
 
@@ -64,18 +75,22 @@ resultsDiv.innerHTML= "";
     console.log("First user:", data.items[0]);
     
    // renderCandidates(data.items);
-   const users = data.items; 
+   const users = data.items || []; 
    const humanUsers = users.filter(user => user.type === "User");
    
+   renderUsers(humanUsers);
 
+    } catch (error) {
+    console.error("GitHub API error:", error);
+    resultsDiv.innerHTML = "<p> failed to load </p>";
+    }
+}
 
+   function renderUsers (users){
 
-
-
-humanUsers.forEach(user =>{
+    users.forEach(user =>{
     const card = document.createElement("div")
     card.className = "user-card";
-
     //const p = document.createElement("p")
     //p.textContent = user.login
     card.innerHTML = `
@@ -91,20 +106,24 @@ humanUsers.forEach(user =>{
     `
 
     resultsDiv.appendChild(card);
+   
 });
-
-
-  } catch (error) {
-    console.error("GitHub API error:", error);
-    resultsDiv.innerHTML = "<p> failed to load </p>";
-  }
-
-
 }
+
+
+
+
  
 
 //handleSearch();
-getUserBtn.addEventListener("click", handleSearch);
+getUserBtn.addEventListener("click", () => handleSearch(false));
+
+loadMore.addEventListener("click", () =>{
+
+    currentPage++;
+    handleSearch(true);
+
+})
 
 
 
