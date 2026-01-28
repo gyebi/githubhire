@@ -1,5 +1,9 @@
 console.log("Script loaded");
 
+import { fetchUserRepos } from "./githubApi.js";
+import { buildCandidateSignals } from "./githubApi.js";
+
+
 //const searchBtn = document.getElementById("searchBtn");
 
 // Inputs
@@ -25,8 +29,8 @@ async function handleSearch(isLoadMore = false) {
     }
 
     // 1. Read values from UI
-   country = countryInput.value;
-   language = languageInput.value;
+   const country = countryInput.value.trim();
+   const language = languageInput.value.trim();
    const results_per_page = Number(recordsInput.value);
   
   //const keyword = searchInput.value.trim();
@@ -65,7 +69,7 @@ async function handleSearch(isLoadMore = false) {
 
   //resultsGrid.innerHTML = "";
 
-resultsDiv.innerHTML= "";
+//resultsDiv.innerHTML= "";
 
   try {
     const response = await fetch(url);
@@ -84,6 +88,10 @@ resultsDiv.innerHTML= "";
     console.error("GitHub API error:", error);
     resultsDiv.innerHTML = "<p> failed to load </p>";
     }
+
+    const jobProfile = getJobProfile();
+    console.log("Job Profile:", jobProfile);
+
 }
 
    function renderUsers (users){
@@ -95,7 +103,7 @@ resultsDiv.innerHTML= "";
     //p.textContent = user.login
     card.innerHTML = `
     
-    <img src = "${user.avatar_url}" alt = "${user.login} />
+    <img src = "${user.avatar_url}" alt = "${user.login}" />
 
     <div class = "user-info">
 
@@ -112,8 +120,57 @@ resultsDiv.innerHTML= "";
 
 
 
+function getJobProfile(){
 
- 
+  const titleInput = document.getElementById("jobTitle");
+  const roleTypeInput = document.getElementById("roleType");
+  const minExperienceInput = document.getElementById("minExperience");
+  const descriptionInput = document.getElementById("jobDescription");
+
+
+  const title = titleInput.value.trim();
+  const roleType = roleTypeInput.value.trim();
+  const minExperience = Number(minExperienceInput.value.trim()) ||0; 
+  const description = descriptionInput.value.trim();
+
+  // Collect checked languages
+  const languages = Array.from(
+    document.querySelectorAll(
+      '.job-panel input[type="checkbox"]:checked'
+    )
+  )
+    .filter(cb =>
+      ["JavaScript", "Python", "Java", "Kotlin", "PHP", "Go"].includes(cb.value)
+    )
+    .map(cb => cb.value);
+
+  // Collect checked frameworks
+  const frameworks = Array.from(
+    document.querySelectorAll(
+      '.job-panel input[type="checkbox"]:checked'
+    )
+  )
+    .filter(cb =>
+      ["React", "Node", "Django", "Spring", "Android", "Firebase"].includes(cb.value)
+    )
+    .map(cb => cb.value);
+
+
+    //job description 
+
+    const jobProfile = {
+    title,
+    roleType,
+    languages,
+    frameworks,
+    minExperience,
+    description
+  };
+
+  return jobProfile;
+}
+
+
 
 //handleSearch();
 getUserBtn.addEventListener("click", () => handleSearch(false));

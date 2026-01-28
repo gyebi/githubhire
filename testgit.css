@@ -185,6 +185,53 @@ body{
 }
 
 
+.job-panel{
+  background: rgba(136, 146, 167, 0.75);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.job-panel h2{
+  margin-bottom: 14px;
+}
+
+.field{
+  margin-bottom: 14px;
+}
+
+.field label{
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(15,26,48,.6);
+  color: #e7eefc;
+}
+
+.checkbox-group{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.checkbox-group label{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: normal;
+}
+
+
 
 @media (max-width: 600px){
   body{ padding: 16px; }
