@@ -1,7 +1,48 @@
 console.log("Script loaded");
 
-import { fetchUserRepos } from "./githubApi.js";
-import { buildCandidateSignals } from "./githubApi.js";
+import { fetchUserRepos, enrichUserWithLanguages } from "./githubApi.js";
+//import { buildAllCandidateSignals } from "./githubApi.js";
+
+
+//score weights 
+const score_weights = {
+  languageMatch: 40,
+  frameworkMatch: 25,
+  experience: 20,
+  activity: 15
+};
+
+const known_frameworks = [
+  "React",
+  "Vue",
+  "Angular",
+  "Svelte",
+  "Next.js",
+  "Nuxt",
+  "Express",
+  "NestJS",
+  "Django",
+  "Flask",
+  "Spring",
+  "Laravel"
+];
+
+const known_languages = [
+  "JavaScript",
+  "TypeScript",
+  "Python",
+  "Java",
+  "C#",
+  "C++",
+  "Go",
+  "Rust",
+  "PHP",
+  "Ruby",
+  "Swift",
+  "Kotlin",
+  "Dart"
+];
+
 
 
 //const searchBtn = document.getElementById("searchBtn");
@@ -28,6 +69,7 @@ async function handleSearch(isLoadMore = false) {
         resultsDiv.innerHTML = "";
     }
 
+   // let candidateSignalStore = [];
     // 1. Read values from UI
    const country = countryInput.value.trim();
    const language = languageInput.value.trim();
@@ -71,105 +113,181 @@ async function handleSearch(isLoadMore = false) {
 
 //resultsDiv.innerHTML= "";
 
-  try {
+ 
     const response = await fetch(url);
     const data = await response.json();
 
     console.log("GitHub search results:", data);
     console.log("First user:", data.items[0]);
+   
     
    // renderCandidates(data.items);
-   const users = data.items || []; 
-   const humanUsers = users.filter(user => user.type === "User");
+   const allUsers = data.items || []; 
+   const humanUsers = allUsers.filter(user => user.type === "User");
    
-   renderUsers(humanUsers);
+   
 
-    } catch (error) {
-    console.error("GitHub API error:", error);
-    resultsDiv.innerHTML = "<p> failed to load </p>";
-    }
+ const enrichedUsers = await Promise.all(
+  humanUsers.map(user => enrichUser(user))
+);
 
-    const jobProfile = getJobProfile();
-    console.log("Job Profile:", jobProfile);
+    console.log(enrichedUsers[0].languages);
+    console.log(enrichedUsers[0].frameworks);
+/*
+const enrichedUsers = await Promise.all(
+  humanUsers.map(user => enrichUserWithFrameworks(user))
+);
+*/
+
+let currentUsers = enrichedUsers; 
+
+const selectedLanguage = "TypeScript"; // temporary hardcoded for now
+
+if (selectedLanguage) {
+  currentUsers = currentUsers.filter(user =>
+    user.languages.includes(selectedLanguage)
+  );
+}
+
+const selectedFramework = "React"; // temporary hardcoded for now
+
+if (selectedFramework) {
+  currentUsers = currentUsers.filter(user =>
+    user.frameworks.includes(selectedFramework)
+  );
+}
+
+
+
+async function enrichUser(user) {
+  const repos = await fetchUserRepos(user.login);
+
+  const languages = extractLanguagesFromRepos(repos);
+  const frameworks = extractFrameworksFromRepos(repos);
+  const repoCount = repos.length;
+  const lastActiveAt = getLastActivityDate(repos)
+
+  return {
+    ...user,
+    languages,     // ✅ always exists
+    frameworks,     // ✅ always exists
+    repoCount, 
+    lastActiveAt
+  };
+}
+
+const scoredUsers = enrichedUsers.map(user => ({
+  ...user,
+  totalScore: calculateTotalScore(user, selectedLanguages, selectedFrameworks)
+}));
+
+const rankedUsers = scoredUsers.sort((a, b) => b.totalScore - a.totalScore);
+
+console.log("enrichedUsers ready:", enrichedUsers.length);
+
+//console.log(enrichedUsers)
+//console.log(enrichedUsers[0]);
+
+console.table(
+  scoredUsers.map(u => ({
+    user: u.login,
+    repoCount: u.repoCount,
+    experienceScore: calculateExperienceScore(u),
+    total: u.totalScore
+  }))
+);
+
+//console.log(rankedUsers.map(u => ({ user: u.login, totalScore: u.totalScore })));
+
+renderUsers(rankedUsers);
 
 }
 
-   function renderUsers (users){
+function renderUsers(users) {
+  resultsDiv.innerHTML = "";
 
-    users.forEach(user =>{
-    const card = document.createElement("div")
+  users.forEach(user => {
+    const card = document.createElement("div");
     card.className = "user-card";
-    //const p = document.createElement("p")
-    //p.textContent = user.login
+
     card.innerHTML = `
-    
-    <img src = "${user.avatar_url}" alt = "${user.login}" />
+      <div class="card-header">
+        <img src="${user.avatar_url}" alt="${user.login}" />
+        <div>
+          <h3>${user.login}</h3>
+          <span class="score-badge">${user.totalScore}</span>
+        </div>
+      </div>
 
-    <div class = "user-info">
+      <div class="card-section">
+        <strong>Languages:</strong>
+        <div class="pill-group">
+          ${user.languages.map(l => `<span class="pill">${l}</span>`).join("")}
+        </div>
+      </div>
 
-    <h3> ${user.login}</h3>
-    <a href = "${user.html_url}" target = "_blank"> View GitHub </a>
+      <div class="card-section">
+        <strong>Frameworks:</strong>
+        <div class="pill-group">
+          ${user.frameworks.map(f => `<span class="pill framework">${f}</span>`).join("")}
+        </div>
+      </div>
 
-    </div>
-    `
+      <div class="card-meta">
+        <span>📦 Repos: ${user.repoCount}</span>
+        <span>⏱ Last active: ${formatDate(user.lastActiveAt)}</span>
+      </div>
+
+      <a class="profile-link" href="${user.html_url}" target="_blank">
+        View GitHub →
+      </a>
+    `;
 
     resultsDiv.appendChild(card);
-   
-});
+  });
+}
+
+function formatDate(date) {
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString();
+}
+
+function extractFrameworksFromRepos(repos) {
+  const frameworkSet = new Set();
+
+  repos.forEach(repo => {
+    const searchableText = `
+      ${repo.name || ""}
+      ${repo.description || ""}
+      ${(repo.topics || []).join(" ")}
+    `.toLowerCase();
+
+    known_frameworks.forEach(framework => {
+      if (searchableText.includes(framework.toLowerCase())) {
+        frameworkSet.add(framework);
+      }
+    });
+  });
+
+  return Array.from(frameworkSet);
 }
 
 
+function extractLanguagesFromRepos(repos) {
+  const languageSet = new Set();
 
-function getJobProfile(){
+  repos.forEach(repo => {
+    if (!repo.language) return;
 
-  const titleInput = document.getElementById("jobTitle");
-  const roleTypeInput = document.getElementById("roleType");
-  const minExperienceInput = document.getElementById("minExperience");
-  const descriptionInput = document.getElementById("jobDescription");
+    known_languages.forEach(lang => {
+      if (repo.language.toLowerCase() === lang.toLowerCase()) {
+        languageSet.add(lang);
+      }
+    });
+  });
 
-
-  const title = titleInput.value.trim();
-  const roleType = roleTypeInput.value.trim();
-  const minExperience = Number(minExperienceInput.value.trim()) ||0; 
-  const description = descriptionInput.value.trim();
-
-  // Collect checked languages
-  const languages = Array.from(
-    document.querySelectorAll(
-      '.job-panel input[type="checkbox"]:checked'
-    )
-  )
-    .filter(cb =>
-      ["JavaScript", "Python", "Java", "Kotlin", "PHP", "Go"].includes(cb.value)
-    )
-    .map(cb => cb.value);
-
-  // Collect checked frameworks
-  const frameworks = Array.from(
-    document.querySelectorAll(
-      '.job-panel input[type="checkbox"]:checked'
-    )
-  )
-    .filter(cb =>
-      ["React", "Node", "Django", "Spring", "Android", "Firebase"].includes(cb.value)
-    )
-    .map(cb => cb.value);
-
-
-    //job description 
-
-    const jobProfile = {
-    title,
-    roleType,
-    languages,
-    frameworks,
-    minExperience,
-    description
-  };
-
-  return jobProfile;
+  return Array.from(languageSet);
 }
-
 
 
 //handleSearch();
@@ -184,107 +302,80 @@ loadMore.addEventListener("click", () =>{
 
 
 
+// scoring ...checkboxes  
+
+const selectedLanguages = ["JavaScript", "TypeScript"];
+const selectedFrameworks = ["React"];
 
 
+//languages
+function calculateLanguageScore(user, selectedLanguages) {
+  if (!selectedLanguages.length) return 0;
 
+  const matches = selectedLanguages.filter(lang =>
+    user.languages.includes(lang)
+  );
 
-
-
-
-
-/*
-async function fetchFullProfile(username) {
-  const url = `https://api.github.com/users/${username}`;
-
-  try {
-    const response = await fetch(url);
-    const profile = await response.json();
-
-    return profile;
-
-  } catch (error) {
-    console.error("Failed to fetch profile for:", username, error);
-    return null;
-  }
+  return (matches.length / selectedLanguages.length) * score_weights.languageMatch;
 }
 
 
-async function enrichUsers(users) {
-  //const enrichedUsers = [];
-    const humanUsers = data.items.filter(user => user.type === "User");
-    const enrichedUsers = await enrichUsers(humanUsers);
+//frameworks 
+function calculateFrameworkScore(user, selectedFrameworks) {
+  if (!selectedFrameworks.length) return 0;
 
-  for (const user of users) {
-    console.log("Enriching:", user.login);
+  const matches = selectedFrameworks.filter(fw =>
+    user.frameworks.includes(fw)
+  );
 
-    const profile = await fetchFullProfile(user.login);
-
-    if (!profile) continue;
-
-    const enrichedUser = {
-      username: profile.login,
-      name: profile.name,
-      avatar: profile.avatar_url,
-      location: profile.location,
-      followers: profile.followers,
-      publicRepos: profile.public_repos,
-      bio: profile.bio,
-      blog: profile.blog,
-      githubUrl: profile.html_url,
-      accountCreated: profile.created_at
-    };
-
-    enrichedUsers.push(enrichedUser);
-  }
-
-  console.log("Enriched users:", enrichedUsers);
-  return enrichedUsers;
+  return (matches.length / selectedFrameworks.length) * score_weights.frameworkMatch;
 }
 
 
-/*
-function renderCandidates(users) {
-  resultsGrid.innerHTML = "";
+function calculateExperienceScore(user) {
+  const repoCount = user.repoCount;
 
-  if (!users || users.length === 0) {
-    resultsGrid.innerHTML = "<p>No candidates found.</p>";
-    return;
-  }
-
-  users.forEach(user => {
-    const card = document.createElement("article");
-    card.className = "card";
-
-    card.innerHTML = `
-      <div class="card-top">
-        <img class="avatar" src="${user.avatar_url}" alt="${user.login}" />
-
-        <div class="who">
-          <h3>${user.login}</h3>
-          <p class="muted">GitHub User</p>
-        </div>
-
-        <div class="score">
-          <span class="score-num">--</span>
-          <span class="score-label">Talent Score</span>
-        </div>
-      </div>
-
-      <div class="card-actions">
-        <a class="btn btn-ghost"
-           href="${user.html_url}"
-           target="_blank"
-           rel="noopener">
-           View GitHub
-        </a>
-
-        <button class="btn btn-primary" type="button">
-          Shortlist
-        </button>
-      </div>
-    `;
-
-    resultsGrid.appendChild(card);
-  });
+  if (repoCount >= 11) return score_weights.experience;
+  if (repoCount >= 6) return score_weights.experience * 0.75;
+  if (repoCount >= 3) return score_weights.experience * 0.5;
+  return score_weights.experience * 0.25;
 }
-*/
+
+function getLastActivityDate(repos) {
+  if (!repos.length) return null;
+
+  return repos
+    .map(repo => new Date(repo.updated_at))
+    .sort((a, b) => b - a)[0];
+}
+
+function calculateActivityScore(user) {
+  if (!user.lastActiveAt) return 0;
+
+  const daysAgo =
+    (Date.now() - new Date(user.lastActiveAt)) / (1000 * 60 * 60 * 24);
+
+  if (daysAgo <= 30) return score_weights.activity *1;
+  if (daysAgo <= 90) return score_weights.activity * 0.66;
+  if (daysAgo <= 180) return score_weights.activity * 0.33;
+  return 0;
+}
+
+
+function calculateTotalScore(user, selectedLanguages, selectedFrameworks) {
+  const languageScore = calculateLanguageScore(user, selectedLanguages);
+  const frameworkScore = calculateFrameworkScore(user, selectedFrameworks);
+
+  const experienceScore = calculateExperienceScore(user);
+  const activityScore = calculateActivityScore(user);
+
+  return Math.round(
+    languageScore +
+    frameworkScore +
+    experienceScore +
+    activityScore
+  );
+}
+
+
+
