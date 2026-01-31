@@ -12,6 +12,103 @@ const score_weights = {
   activity: 15
 };
 
+
+//countries of the world 
+
+export const countries = [
+  { name: "Afghanistan", code: "AF" },
+  { name: "Albania", code: "AL" },
+  { name: "Algeria", code: "DZ" },
+  { name: "Andorra", code: "AD" },
+  { name: "Angola", code: "AO" },
+  { name: "Argentina", code: "AR" },
+  { name: "Armenia", code: "AM" },
+  { name: "Australia", code: "AU" },
+  { name: "Austria", code: "AT" },
+  { name: "Azerbaijan", code: "AZ" },
+  { name: "Bahamas", code: "BS" },
+  { name: "Bahrain", code: "BH" },
+  { name: "Bangladesh", code: "BD" },
+  { name: "Belgium", code: "BE" },
+  { name: "Belize", code: "BZ" },
+  { name: "Benin", code: "BJ" },
+  { name: "Bolivia", code: "BO" },
+  { name: "Botswana", code: "BW" },
+  { name: "Brazil", code: "BR" },
+  { name: "Bulgaria", code: "BG" },
+  { name: "Burkina Faso", code: "BF" },
+  { name: "Burundi", code: "BI" },
+  { name: "Cambodia", code: "KH" },
+  { name: "Cameroon", code: "CM" },
+  { name: "Canada", code: "CA" },
+  { name: "Chile", code: "CL" },
+  { name: "China", code: "CN" },
+  { name: "Colombia", code: "CO" },
+  { name: "Costa Rica", code: "CR" },
+  { name: "Croatia", code: "HR" },
+  { name: "Cuba", code: "CU" },
+  { name: "Cyprus", code: "CY" },
+  { name: "Czech Republic", code: "CZ" },
+  { name: "Denmark", code: "DK" },
+  { name: "Dominican Republic", code: "DO" },
+  { name: "Ecuador", code: "EC" },
+  { name: "Egypt", code: "EG" },
+  { name: "Estonia", code: "EE" },
+  { name: "Ethiopia", code: "ET" },
+  { name: "Finland", code: "FI" },
+  { name: "France", code: "FR" },
+  { name: "Germany", code: "DE" },
+  { name: "Ghana", code: "GH" },
+  { name: "Greece", code: "GR" },
+  { name: "Hungary", code: "HU" },
+  { name: "Iceland", code: "IS" },
+  { name: "India", code: "IN" },
+  { name: "Indonesia", code: "ID" },
+  { name: "Ireland", code: "IE" },
+  { name: "Israel", code: "IL" },
+  { name: "Italy", code: "IT" },
+  { name: "Japan", code: "JP" },
+  { name: "Kenya", code: "KE" },
+  { name: "Luxembourg", code: "LU" },
+  { name: "Malaysia", code: "MY" },
+  { name: "Mexico", code: "MX" },
+  { name: "Morocco", code: "MA" },
+  { name: "Netherlands", code: "NL" },
+  { name: "New Zealand", code: "NZ" },
+  { name: "Nigeria", code: "NG" },
+  { name: "Norway", code: "NO" },
+  { name: "Pakistan", code: "PK" },
+  { name: "Peru", code: "PE" },
+  { name: "Philippines", code: "PH" },
+  { name: "Poland", code: "PL" },
+  { name: "Portugal", code: "PT" },
+  { name: "Romania", code: "RO" },
+  { name: "Russia", code: "RU" },
+  { name: "Saudi Arabia", code: "SA" },
+  { name: "Senegal", code: "SN" },
+  { name: "Singapore", code: "SG" },
+  { name: "South Africa", code: "ZA" },
+  { name: "South Korea", code: "KR" },
+  { name: "Spain", code: "ES" },
+  { name: "Sweden", code: "SE" },
+  { name: "Switzerland", code: "CH" },
+  { name: "Tanzania", code: "TZ" },
+  { name: "Thailand", code: "TH" },
+  { name: "Turkey", code: "TR" },
+  { name: "Uganda", code: "UG" },
+  { name: "Ukraine", code: "UA" },
+  { name: "United Arab Emirates", code: "AE" },
+  { name: "United Kingdom", code: "GB" },
+  { name: "United States", code: "US" },
+  { name: "Zambia", code: "ZM" },
+  { name: "Zimbabwe", code: "ZW" }
+];
+
+
+
+
+
+//well known frameworks 
 const known_frameworks = [
   "React",
   "Vue",
@@ -45,10 +142,72 @@ const known_languages = [
 
 
 
+
+
 //const searchBtn = document.getElementById("searchBtn");
 
 // Inputs
+
 const countryInput = document.getElementById("country");
+const suggestionsBox = document.getElementById("countrySuggestions");
+const countryError = document.getElementById("countryError");
+
+
+let selectedCountry = null;
+
+countryInput.addEventListener("input", () => {
+  const value = countryInput.value.trim().toLowerCase();
+  suggestionsBox.innerHTML = "";
+  selectedCountry = null;
+
+  if (!value) {
+    suggestionsBox.classList.add("hidden");
+    return;
+  }
+
+  const matches = countries.filter(c =>
+    c.name.toLowerCase().startsWith(value)
+  );
+
+  if (matches.length === 0) {
+    suggestionsBox.classList.add("hidden");
+    return;
+  }
+
+  matches.forEach(country => {
+    const li = document.createElement("li");
+    li.textContent = country.name;
+
+    li.addEventListener("click", () => {
+      countryInput.value = country.name;
+      selectedCountry = country.name;
+      suggestionsBox.classList.add("hidden");
+      countryError.classList.add("hidden");
+    });
+
+    suggestionsBox.appendChild(li);
+  });
+
+  suggestionsBox.classList.remove("hidden");
+});
+
+/*
+function validateCountry() {
+  if (!selectedCountry) {
+    countryError.classList.remove("hidden");
+    return false;
+  }
+  return true;
+}
+
+searchBtn.addEventListener("click", () => {
+  if (!validateCountry()) return;
+
+  console.log("Searching for country:", selectedCountry);
+  // proceed with GitHub search
+});
+*/
+
 const languageInput = document.getElementById("language");
 const recordsInput = document.getElementById("num-records");
 //const searchInput = document.getElementById("q");
@@ -69,28 +228,23 @@ async function handleSearch(isLoadMore = false) {
         resultsDiv.innerHTML = "";
     }
 
-   // let candidateSignalStore = [];
+  
     // 1. Read values from UI
    const country = countryInput.value.trim();
    const language = languageInput.value.trim();
    const results_per_page = Number(recordsInput.value);
   
   //const keyword = searchInput.value.trim();
-   
-  //const language = "Javascript";
-  //const country = "Ghana";
 
-  console.log(`"Language:", ${country}`);
-  console.log(`"Country:", ${language}`);
-  //console.log("Keyword:", keyword);
-/*
+
   // 2. Build GitHub search query
   let queryParts = [];
 
+  /*
   if (keyword) {
     queryParts.push(keyword);
   }
-
+*/
   if (language) {
     queryParts.push(`language:${language}`);
   }
@@ -98,9 +252,9 @@ async function handleSearch(isLoadMore = false) {
   if (country) {
     queryParts.push(`location:${country}`);
   }
-*/
-  //const query = queryParts.join(" ");
-  const query = `language:${language} location:${country}`;
+
+  const query = queryParts.join(" ");
+  //const query = `language:${language} location:${country}`;
 
   console.log("Final GitHub query:", query);
 
@@ -141,7 +295,33 @@ const enrichedUsers = await Promise.all(
 
 let currentUsers = enrichedUsers; 
 
-const selectedLanguage = "TypeScript"; // temporary hardcoded for now
+  // Collect checked languages
+  const selectedLanguage = Array.from(
+    document.querySelectorAll(
+      '.job-panel input[type="checkbox"]:checked'
+    )
+  )
+  /*
+    .filter(cb =>
+      ["JavaScript", "Python", "Java", "Kotlin", "PHP", "Go"].includes(cb.value)
+    )
+      */
+    .map(cb => cb.value);
+
+  // Collect checked frameworks
+  const selectedFramework = Array.from(
+    document.querySelectorAll(
+      '.job-panel input[type="checkbox"]:checked'
+    )
+  )
+  /*
+    .filter(cb =>
+      ["React", "Node", "Django", "Spring", "Android", "Firebase"].includes(cb.value)
+    )*/
+    .map(cb => cb.value);
+
+
+//const selectedLanguage = "TypeScript"; // temporary hardcoded for now
 
 if (selectedLanguage) {
   currentUsers = currentUsers.filter(user =>
@@ -149,7 +329,7 @@ if (selectedLanguage) {
   );
 }
 
-const selectedFramework = "React"; // temporary hardcoded for now
+//const selectedFramework = "React"; // temporary hardcoded for now
 
 if (selectedFramework) {
   currentUsers = currentUsers.filter(user =>
@@ -215,7 +395,7 @@ function renderUsers(users) {
         <img src="${user.avatar_url}" alt="${user.login}" />
         <div>
           <h3>${user.login}</h3>
-          <span class="score-badge">${user.totalScore}</span>
+          <span class="score-badge">Ranking: ${user.totalScore}</span>
         </div>
       </div>
 
@@ -333,7 +513,10 @@ function calculateFrameworkScore(user, selectedFrameworks) {
 
 
 function calculateExperienceScore(user) {
-  const repoCount = user.repoCount;
+  const repoCount =
+  user.public_repos ??
+  user.repoCount ??
+  0;
 
   if (repoCount >= 11) return score_weights.experience;
   if (repoCount >= 6) return score_weights.experience * 0.75;

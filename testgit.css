@@ -139,6 +139,61 @@ body{
 }
 
 
+.field-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  color: black;
+}
+
+.field-group input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  z-index: 10;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.suggestions li {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background: #f0f0f0;
+}
+
+.hidden {
+  display: none;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+
+
 .field {
   display: flex;
   flex-direction: column;
@@ -191,6 +246,8 @@ body{
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 20px;
+
+ 
 }
 
 .job-panel h2{
@@ -205,6 +262,7 @@ body{
   display: block;
   font-weight: 600;
   margin-bottom: 6px;
+ 
 }
 
 .field input,
@@ -222,6 +280,7 @@ body{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 8px;
+  font-size: 1.0rem;
 }
 
 .checkbox-group label{
@@ -229,6 +288,7 @@ body{
   gap: 8px;
   align-items: center;
   font-weight: normal;
+  font-size:1.0rem;
 }
 
 .results-grid,
